@@ -34,6 +34,10 @@ export default function AuthForm({ mode, onSuccess, switchMode }) {
 
   return (
     <div className="auth-form">
+      <div className="auth-logo">
+        <img src="/krishi_logo.png" alt="Krishi AI Logo" />
+        <h1>Krishi AI Assistant</h1>
+      </div>
       <h2>{mode === "login" ? "Login" : "Sign Up"}</h2>
       <form onSubmit={handleSubmit}>
         <input

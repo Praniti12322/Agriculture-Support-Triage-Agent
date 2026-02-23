@@ -94,7 +94,7 @@
   background: white;
   padding: 5px;
   border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .input-group input {
@@ -145,6 +145,24 @@
   text-align: center;
 }
 
+.auth-logo {
+  margin-bottom: 2rem;
+}
+
+.auth-logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.auth-logo h1 {
+  font-size: 1.5rem;
+  color: #008069;
+  margin: 0;
+  font-weight: 700;
+}
+
 .auth-form h2 {
   margin-top: 0;
   color: #008069;
@@ -184,6 +202,69 @@
   cursor: pointer;
   font-size: 0.9rem;
 }
+
 .mode-toggle:hover {
   text-decoration: underline;
+}
+
+.extra-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.location-input {
+  flex: 2;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.urgency-select {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: white;
+  outline: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.user-message-header,
+.bot-message-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.location-tag,
+.urgency-tag {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+.urgency-tag.high {
+  background-color: #ffcccc;
+  color: #cc0000;
+}
+
+.urgency-tag.medium {
+  background-color: #fff4cc;
+  color: #856404;
+}
+
+.urgency-tag.low {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.user-message-body {
+  word-break: break-word;
 }

@@ -36,6 +36,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState("login");
 
   const [msg, setMsg] = useState("");
+  const [location, setLocation] = useState("");
   const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -60,9 +61,10 @@ export default function App() {
   const send = async () => {
     if (!msg.trim()) return;
 
-    // Immediately push user's message to UI
+    // Immediately push user's message to UI with location
     const userMessage = msg;
-    setChat((prev) => [...prev, { user: userMessage, bot: null }]);
+    const currentLoc = location;
+    setChat((prev) => [...prev, { user: userMessage, location: currentLoc, bot: null, urgency: null }]);
     setMsg("");
     setLoading(true);
 
@@ -73,7 +75,10 @@ export default function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          message: userMessage,
+          location: currentLoc
+        }),
       });
 
       if (res.status === 401) {
@@ -83,10 +88,11 @@ export default function App() {
 
       const data = await res.json();
 
-      // Update the last message in chat array with the bot's response
+      // Update the last message in chat array with the bot's response and detected urgency
       setChat((prev) => {
         const newChat = [...prev];
         newChat[newChat.length - 1].bot = data.response;
+        newChat[newChat.length - 1].urgency = data.urgency;
         return newChat;
       });
 
@@ -117,7 +123,10 @@ export default function App() {
   return (
     <div className="App">
       <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>🌾 Krishi AI Assistant</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/krishi_logo.png" alt="Krishi AI Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'white', padding: '2px' }} />
+          <h1>Krishi AI Assistant</h1>
+        </div>
         <button onClick={handleLogout} style={{ background: 'transparent', color: 'white', border: '1px solid white', padding: '5px 15px', borderRadius: '4px', cursor: 'pointer' }}>Logout</button>
       </header>
 
@@ -127,13 +136,25 @@ export default function App() {
             {c.user && (
               <div className="message-wrapper user">
                 <div className="chat-bubble user">
-                  {c.user}
+                  <div className="user-message-header">
+                    {c.location && <span className="location-tag">📍 {c.location}</span>}
+                  </div>
+                  <div className="user-message-body">
+                    {c.user}
+                  </div>
                 </div>
               </div>
             )}
             {c.bot ? (
               <div className="message-wrapper bot">
                 <div className="chat-bubble bot">
+                  {c.urgency && (
+                    <div className="bot-message-header">
+                      <span className={`urgency-tag ${c.urgency.toLowerCase()}`}>
+                        AI-Detected Urgency: {c.urgency}
+                      </span>
+                    </div>
+                  )}
                   {formatResponseText(c.bot)}
                 </div>
               </div>
@@ -151,6 +172,14 @@ export default function App() {
       </div>
 
       <footer className="footer">
+        <div className="extra-inputs">
+          <input
+            className="location-input"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Enter location (e.g. Punjab)"
+          />
+        </div>
         <div className="input-group">
           <input
             value={msg}

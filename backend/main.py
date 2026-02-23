@@ -90,18 +90,25 @@ def chat(
     current_user: str = Depends(auth.get_current_user),
 ):
     message = payload.get("message", "")
+    location = payload.get("location", "Not specified")
+
     if not message:
         return {"response": "Please provide a crop issue description.", "image": ""}
         
     prompt = f"""You are an expert agricultural AI assistant analyzing crop issues.
 
 User query: "{message}"
+Location: {location}
+
+Analyze the situation and determine the urgency level: Low, Medium, or High.
 
 Please provide a detailed, structured response formatted as follows:
+[[URGENCY: LOW/MEDIUM/HIGH]]
 **Crop Name**: [Identify the crop and variety if applicable]
-**Location/Plant Part Affected**: [Typical growing regions or specific parts of the plant affected]
+**Urgency**: [Acknowledge the detected urgency level and explain the timeframe for action]
+**Location/Plant Part Affected**: [Tailor advice for {location} if relevant, and describe parts affected]
 **Time/Growth Stage**: [Time of year or growth stage when this issue typically occurs]
-**Solution**: [Detailed, actionable suggestions or treatments to resolve the problem so the crop grows better]
+**Solution**: [Detailed, actionable suggestions or treatments to resolve the problem]
 
 Ensure the tone is helpful and informative.
 """
@@ -117,7 +124,21 @@ Ensure the tone is helpful and informative.
             ],
             model=model_name,
         )
-        return {"response": chat_completion.choices[0].message.content, "image": ""}
+        content = chat_completion.choices[0].message.content
+        
+        # Extract urgency from response
+        detected_urgency = "Medium"
+        if "[[URGENCY: HIGH]]" in content:
+            detected_urgency = "High"
+        elif "[[URGENCY: MEDIUM]]" in content:
+            detected_urgency = "Medium"
+        elif "[[URGENCY: LOW]]" in content:
+            detected_urgency = "Low"
+            
+        # Clean up response to remove the internal tag
+        cleaned_content = content.replace("[[URGENCY: HIGH]]", "").replace("[[URGENCY: MEDIUM]]", "").replace("[[URGENCY: LOW]]", "").strip()
+            
+        return {"response": cleaned_content, "urgency": detected_urgency, "image": ""}
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "rate_limit" in error_msg.lower():

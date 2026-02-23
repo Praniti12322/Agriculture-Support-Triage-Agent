@@ -1,113 +1,119 @@
-🌾 Agriculture Support Triage Agent (AI)
+# 🌾 Krishi AI Assistant
 
-An AI-powered Agriculture Assistance System that analyzes farmers' problems in real time and generates intelligent solutions using Qube AI (LLM API).
+Krishi AI Assistant is a professional, AI-powered agricultural support platform designed to help farmers diagnose crop issues in real-time. It uses advanced Large Language Models (LLMs) via the Groq API to provide tailored advice based on crop symptoms, location, and automatically detected urgency levels.
 
-The system acts as a first-level support agent — it understands the farmer’s issue, determines urgency, extracts important details, and provides a helpful response through a simple GUI.
+## 🚀 Features
 
-🚜 Features
+- **AI-Detected Urgency**: Automatically categorizes crop issues as Low, Medium, or High urgency to provide prioritized advice.
+- **Location-Aware Support**: Tailors agricultural suggestions based on the user's specific region.
+- **Professional Chat Interface**: A clean, modern, and responsive UI built with React.
+- **Secure Authentication**: User sign-up and login functionality with JWT-based security.
+- **AI-Powered Diagnostics**: Leveraging the Groq API for fast and intelligent agricultural insights.
 
-Real-time agriculture query analysis
+## 🛠️ Tech Stack
 
-Urgency classification (Low / Medium / High / Emergency)
+- **Frontend**: React.js, Vanilla CSS
+- **Backend**: FastAPI (Python), SQLModel (SQLite)
+- **AI Engine**: Groq API (Llama 3 / Mixtral models)
+- **Authentication**: JWT (JSON Web Tokens)
 
-Intent detection (disease, pest, irrigation, fertilizer, weather, etc.)
+---
 
-Named Entity Recognition (crop, location, date, symptoms)
+## 📋 Prerequisites
 
-AI generated farmer-friendly suggestions
+Before you begin, ensure you have the following installed:
+- [Python 3.8+](https://www.python.org/downloads/)
+- [Node.js (v14+) and npm](https://nodejs.org/en/download/)
+- A [Groq Cloud API Key](https://console.groq.com/keys)
 
-Hindi + English input support
+---
 
-Desktop GUI interface (Tkinter)
+## ⚙️ Setup Instructions
 
-Fast response using Qube AI LLM API
+### 1. Clone the Repository
 
-🧠 How It Works
+```bash
+git clone <your-repository-url>
+cd Agriculture-Support-Triage-Agent
+```
 
-Farmer types problem in the GUI
+### 2. Backend Setup (FastAPI)
 
-System sends query to Qube AI
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-AI processes text using structured prompt
+2. Create a virtual environment and activate it:
+   ```bash
+   python -m venv venv
+   # On Windows:
+   .\venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+   ```
 
-Returns structured JSON containing:
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Urgency level
+4. Create a `.env` file in the `backend/` folder and add your credentials:
+   ```env
+   GROQ_API_KEY=your_groq_api_key_here
+   MODEL=llama3-8b-8192
+   ```
 
-Problem category
+5. Run the backend server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+   The backend will be running at `http://127.0.0.1:8000`.
 
-Extracted information
+### 3. Frontend Setup (React)
 
-Suggested solution
+1. Open a new terminal window and navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-🖥️ Tech Stack
-Technology	Purpose
-Python	Backend logic
-Tkinter	GUI
-Requests	API communication
-Qube AI (LLM API)	Natural Language Understanding
-dotenv	Secure API key handling
-📂 Project Structure
-Agriculture-Triage-Agent
-│── agri_triage_agent.py
-│── .env
-│── README.md
+2. Install the frontend dependencies:
+   ```bash
+   npm install
+   ```
 
-⚙️ Installation
-1. Clone Repository
-git clone https://github.com/your-username/Agriculture-Triage-Agent.git
-cd Agriculture-Triage-Agent
+3. Start the React development server:
+   ```bash
+   npm start
+   ```
+   The frontend will be running at `http://localhost:3000`.
 
-2. Install Dependencies
-pip install requests python-dotenv
+---
 
-🔑 Setup API Key
+## 📖 How to Use
 
-Create .env file:
+1. **Sign Up / Login**: Create an account or log in to access the assistant.
+2. **Set Location**: Type your growing region (e.g., "Punjab", "Tamil Nadu") to receive localized advice.
+3. **Describe Issue**: Enter your crop problem in the chat box.
+4. **AI Response**: The assistant will automatically detect the urgency and provide a structured solution, including crop identification and actionable advice.
 
-QUBE_API_KEY=your_api_key_here
-QUBE_API_URL=https://api.qube.ai/v1/chat/completions
+## 👨‍💻 Project Structure
 
-▶️ Run the Application
-python agri_triage_agent.py
+```
+Agriculture-Support-Triage-Agent/
+├── backend/                # FastAPI source code
+│   ├── main.py             # API endpoints & AI logic
+│   ├── models.py           # SQLModel database models
+│   ├── auth.py             # Security & JWT logic
+│   └── database.py         # DB connection setup
+├── frontend/               # React source code
+│   ├── src/
+│   │   ├── App.js          # Main Chat UI
+│   │   └── AuthForm.js     # Login/Signup components
+│   └── public/             # Static assets (Logo, etc.)
+└── README.md
+```
 
+## 📜 License
 
-The Agriculture AI GUI will open.
-
-💡 Example Query
-
-"My tomato leaves are turning yellow and small insects are visible since 3 days"
-
-AI Output:
-
-Urgency: Medium
-
-Intent: Pest attack
-
-Crop: Tomato
-
-Suggestion: Spray neem oil or imidacloprid pesticide
-
-🎯 Objective
-
-To reduce delay in agricultural advisory support by providing instant AI-generated assistance and prioritizing serious crop problems.
-
-📈 Future Enhancements
-
-Farmer database & ticket system
-
-Image-based crop disease detection
-
-WhatsApp chatbot integration
-
-Government scheme recommendations
-
-Multi-language support
-
-👨‍💻 Author
-
-Developed as an AI-based smart agriculture support system project using Large Language Models.
-
-📜 License
-
-This project is for educational and research purposes.
+This project is for educational purposes. Feel free to contribute or adapt it for your own agricultural projects!
