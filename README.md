@@ -1,21 +1,25 @@
 # 🌾 Krishi AI Assistant
 
-Krishi AI Assistant is a professional, AI-powered agricultural support platform designed to help farmers diagnose crop issues in real-time. It uses advanced Large Language Models (LLMs) via the Groq API to provide tailored advice based on crop symptoms, location, and automatically detected urgency levels.
+Krishi AI Assistant is a professional, AI-powered agricultural support platform designed to help farmers diagnose crop issues in real-time. It uses advanced Large Language Models (LLMs) and Vision Models via the Groq API to provide tailored advice based on crop symptoms, images, location, and automatically detected urgency levels.
 
 ## 🚀 Features
 
-- **AI-Detected Urgency**: Automatically categorizes crop issues as Low, Medium, or High urgency to provide prioritized advice.
-- **Location-Aware Support**: Tailors agricultural suggestions based on the user's specific region.
-- **Professional Chat Interface**: A clean, modern, and responsive UI built with React.
-- **Secure Authentication**: User sign-up and login functionality with JWT-based security.
-- **AI-Powered Diagnostics**: Leveraging the Groq API for fast and intelligent agricultural insights.
+- **🎤 Voice Commands (EN/HI)**: Support for voice input in both English and Hindi for hands-free interaction.
+- **📷 Camera-Based Diagnosis**: Capture or upload photos of crops for instant automated problem analysis.
+- **🚦 Smart Urgency Triage**: Robust AI-driven categorization (Low, Medium, High) with improved detection logic.
+- **📍 Location-Aware Support**: Tailors agricultural suggestions based on the user's specific region.
+- **🎨 Modern Professional UI**: Premium, responsive chat interface with desktop and mobile support.
+- **🔐 Secure Authentication**: User sign-up and login functionality with JWT-based security.
+- **👁️ Vision AI Engine**: Leverages cutting-edge multimodal models on Groq for accurate visual identification.
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React.js, Vanilla CSS
 - **Backend**: FastAPI (Python), SQLModel (SQLite)
-- **AI Engine**: Groq API (Llama 3 / Mixtral models)
+- **AI Vision Engine**: Groq API (`meta-llama/llama-4-scout-17b-16e-instruct`)
+- **AI Text Engine**: Groq API (`llama-3.1-8b-instant`)
 - **Authentication**: JWT (JSON Web Tokens)
+- **APIs**: Web Speech API (for voice), MediaDevices API (for camera)
 
 ---
 
@@ -61,7 +65,7 @@ cd Agriculture-Support-Triage-Agent
 4. Create a `.env` file in the `backend/` folder and add your credentials:
    ```env
    GROQ_API_KEY=your_groq_api_key_here
-   MODEL=llama3-8b-8192
+   MODEL=llama-3.1-8b-instant
    ```
 
 5. Run the backend server:
@@ -93,22 +97,25 @@ cd Agriculture-Support-Triage-Agent
 ## 📖 How to Use
 
 1. **Sign Up / Login**: Create an account or log in to access the assistant.
-2. **Set Location**: Type your growing region (e.g., "Punjab", "Tamil Nadu") to receive localized advice.
-3. **Describe Issue**: Enter your crop problem in the chat box.
-4. **AI Response**: The assistant will automatically detect the urgency and provide a structured solution, including crop identification and actionable advice.
+2. **Select Language**: Toggle between **EN** (English) and **हिन्दी** (Hindi) for voice input.
+3. **Voice/Text Query**: Click the 🎤 icon to speak or type your crop issue.
+4. **Capture Crop Problem**: Click the 📷 icon to take a photo of your plant or upload an existing image.
+5. **Set Location**: Type your growing region (e.g., "Punjab") to receive localized advice.
+6. **AI Response**: The assistant will analyze both text and images to provide a structured solution with a detected urgency level.
 
 ## 👨‍💻 Project Structure
 
 ```
 Agriculture-Support-Triage-Agent/
 ├── backend/                # FastAPI source code
-│   ├── main.py             # API endpoints & AI logic
+│   ├── main.py             # API endpoints & AI logic (Vision + Text)
 │   ├── models.py           # SQLModel database models
 │   ├── auth.py             # Security & JWT logic
 │   └── database.py         # DB connection setup
 ├── frontend/               # React source code
 │   ├── src/
-│   │   ├── App.js          # Main Chat UI
+│   │   ├── App.js          # main Chat UI (Voice/Camera/Chat)
+│   │   ├── App.css         # UI Styling & Animations
 │   │   └── AuthForm.js     # Login/Signup components
 │   └── public/             # Static assets (Logo, etc.)
 └── README.md
