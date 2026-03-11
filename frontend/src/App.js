@@ -39,8 +39,72 @@ export default function App() {
   const [location, setLocation] = useState("");
   const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [language, setLanguage] = useState("en-US"); // Default to English
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setMsg(transcript);
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = language;
+    }
+  }, [language]);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+    } else {
+      setIsRecording(true);
+      recognitionRef.current?.start();
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   // Auto-scroll to bottom of chat when messages change
   useEffect(() => {
@@ -59,26 +123,34 @@ export default function App() {
   };
 
   const send = async () => {
-    if (!msg.trim()) return;
+    if (!msg.trim() && !selectedImage) return;
 
-    // Immediately push user's message to UI with location
     const userMessage = msg;
     const currentLoc = location;
-    setChat((prev) => [...prev, { user: userMessage, location: currentLoc, bot: null, urgency: null }]);
+    const currentImage = imagePreview;
+
+    setChat((prev) => [
+      ...prev,
+      { user: userMessage, location: currentLoc, image: currentImage, bot: null, urgency: null },
+    ]);
     setMsg("");
+    removeImage();
     setLoading(true);
 
     try {
+      const payload = {
+        message: userMessage,
+        location: currentLoc,
+        image: currentImage ? currentImage.split(",")[1] : null, // Send only base64 data
+      };
+
       const res = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          message: userMessage,
-          location: currentLoc
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (res.status === 401) {
@@ -88,14 +160,12 @@ export default function App() {
 
       const data = await res.json();
 
-      // Update the last message in chat array with the bot's response and detected urgency
       setChat((prev) => {
         const newChat = [...prev];
         newChat[newChat.length - 1].bot = data.response;
         newChat[newChat.length - 1].urgency = data.urgency;
         return newChat;
       });
-
     } catch (err) {
       console.error(err);
       setChat((prev) => {
@@ -133,13 +203,14 @@ export default function App() {
       <div className="chat-container">
         {chat.map((c, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {c.user && (
+            { (c.user || c.image) && (
               <div className="message-wrapper user">
                 <div className="chat-bubble user">
                   <div className="user-message-header">
                     {c.location && <span className="location-tag">📍 {c.location}</span>}
                   </div>
                   <div className="user-message-body">
+                    {c.image && <img src={c.image} alt="Crop" className="chat-image" />}
                     {c.user}
                   </div>
                 </div>
@@ -167,7 +238,6 @@ export default function App() {
             )}
           </div>
         ))}
-        {/* Invisible div to scroll to */}
         <div ref={chatEndRef} />
       </div>
 
@@ -179,16 +249,61 @@ export default function App() {
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Enter location (e.g. Punjab)"
           />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button 
+              className={`lang-toggle ${language === "en-US" ? "active" : ""}`}
+              onClick={() => setLanguage("en-US")}
+            >EN</button>
+            <button 
+              className={`lang-toggle ${language === "hi-IN" ? "active" : ""}`}
+              onClick={() => setLanguage("hi-IN")}
+            >हिन्दी</button>
+          </div>
         </div>
+
+        {imagePreview && (
+          <div className="image-preview-container">
+            <img src={imagePreview} alt="Preview" className="image-preview" />
+            <button className="remove-image" onClick={removeImage}>×</button>
+          </div>
+        )}
+
         <div className="input-group">
           <input
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
-            placeholder="Type your crop issue here..."
+            placeholder={isRecording ? "Listening..." : "Type or speak your crop issue..."}
             onKeyPress={(e) => e.key === "Enter" && send()}
             autoFocus
           />
-          <button onClick={send} disabled={loading || !msg.trim()}>
+          
+          <button 
+            type="button"
+            className={`icon-button ${isRecording ? "is-recording" : ""}`}
+            onClick={toggleRecording}
+            title="Voice Commands"
+          >
+            🎤
+          </button>
+
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+          />
+          <button 
+            type="button"
+            className="icon-button"
+            onClick={() => fileInputRef.current.click()}
+            title="Capture Crop Image"
+          >
+            📷
+          </button>
+
+          <button onClick={send} disabled={loading || (!msg.trim() && !selectedImage)}>
             Send
           </button>
         </div>

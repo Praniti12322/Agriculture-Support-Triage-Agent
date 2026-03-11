@@ -11,6 +11,7 @@ import schemas
 import auth
 
 import os
+import re
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -91,16 +92,42 @@ def chat(
 ):
     message = payload.get("message", "")
     location = payload.get("location", "Not specified")
+    image_base64 = payload.get("image") # Base64 encoded image data (without prefix)
 
-    if not message:
-        return {"response": "Please provide a crop issue description.", "image": ""}
+    if not message and not image_base64:
+        return {"response": "Please provide a crop issue description or an image.", "image": ""}
         
-    prompt = f"""You are an expert agricultural AI assistant analyzing crop issues.
+    system_prompt = "You are an expert agricultural AI assistant analyzing crop issues. "
+    
+    if image_base64:
+        # Vision-specific prompt
+        prompt_content = [
+            {
+                "type": "text",
+                "text": f"Analyze this crop image. User query: {message or 'What is the problem with this crop?'}. Location: {location}. "
+                        "Identify the crop, the problem (pest, disease, nutrient deficiency), and suggest a solution. "
+                        "Determine urgency: Low, Medium, or High. "
+                        "IMPORTANT: You MUST start your response with exactly: [[URGENCY: LEVEL]] where LEVEL is LOW, MEDIUM, or HIGH. "
+                        "Format response as: [[URGENCY: LEVEL]] **Crop Name**: ... **Urgency**: ... **Solution**: ..."
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{image_base64}"
+                }
+            }
+        ]
+        model_name = "meta-llama/llama-4-scout-17b-16e-instruct"
+    else:
+        # Text-only prompt
+        prompt_content = f"""You are an expert agricultural AI assistant analyzing crop issues.
 
 User query: "{message}"
 Location: {location}
 
 Analyze the situation and determine the urgency level: Low, Medium, or High.
+
+IMPORTANT: You MUST start your response with exactly: [[URGENCY: LEVEL]] where LEVEL is LOW, MEDIUM, or HIGH.
 
 Please provide a detailed, structured response formatted as follows:
 [[URGENCY: LOW/MEDIUM/HIGH]]
@@ -112,38 +139,43 @@ Please provide a detailed, structured response formatted as follows:
 
 Ensure the tone is helpful and informative.
 """
+        model_name = os.environ.get("MODEL", "llama3-8b-8192")
 
     try:
-        model_name = os.environ.get("MODEL", "llama3-8b-8192")
         chat_completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "user",
-                    "content": prompt,
+                    "content": prompt_content,
                 }
             ],
             model=model_name,
         )
+            
         content = chat_completion.choices[0].message.content
         
-        # Extract urgency from response
+        # Robust urgency extraction using regex (case-insensitive)
         detected_urgency = "Medium"
-        if "[[URGENCY: HIGH]]" in content:
+        urgency_match = re.search(r"\[\[URGENCY:\s*(HIGH|MEDIUM|LOW)\]\]", content, re.IGNORECASE)
+        
+        if urgency_match:
+            detected_urgency = urgency_match.group(1).capitalize()
+        elif "HIGH" in content.upper() and ("urgent" in content.lower() or "critical" in content.lower()):
             detected_urgency = "High"
-        elif "[[URGENCY: MEDIUM]]" in content:
-            detected_urgency = "Medium"
-        elif "[[URGENCY: LOW]]" in content:
-            detected_urgency = "Low"
+        elif "LOW" in content.upper():
+             # Check if it's explicitly low
+             if "low urgency" in content.lower() or "low priority" in content.lower():
+                 detected_urgency = "Low"
             
-        # Clean up response to remove the internal tag
-        cleaned_content = content.replace("[[URGENCY: HIGH]]", "").replace("[[URGENCY: MEDIUM]]", "").replace("[[URGENCY: LOW]]", "").strip()
+        # Clean up response to remove the internal tag (case-insensitive)
+        cleaned_content = re.sub(r"\[\[URGENCY:\s*(HIGH|MEDIUM|LOW)\]\]", "", content, flags=re.IGNORECASE).strip()
             
         return {"response": cleaned_content, "urgency": detected_urgency, "image": ""}
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "rate_limit" in error_msg.lower():
             return {
-                "response": "**API Quota Exceeded:** We are currently receiving too many requests on the Groq network. Please try again in a few moments.", 
+                "response": "**API Quota Exceeded:** We are currently receiving too many requests. Please try again in a few moments.", 
                 "image": ""
             }
         return {"response": f"Error generating response: {error_msg}", "image": ""}
