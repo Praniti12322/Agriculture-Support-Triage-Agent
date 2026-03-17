@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      # Assuming your .env file is in the backend directory 
+      # containing GROQ_API_KEY
+      - ./backend/.env
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Change localhost to your EC2 public IP when deploying to AWS, e.g. http://<EC2_IP>:8000
+        - REACT_APP_API_URL=http://localhost:8000
+    ports:
+      # Maps local port 3000 to the container's Nginx port 80
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always

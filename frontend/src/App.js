@@ -144,7 +144,8 @@ export default function App() {
         image: currentImage ? currentImage.split(",")[1] : null, // Send only base64 data
       };
 
-      const res = await fetch("http://127.0.0.1:8000/chat", {
+      const base = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+      const res = await fetch(`${base}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
