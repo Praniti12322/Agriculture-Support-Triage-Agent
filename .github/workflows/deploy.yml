@@ -45,6 +45,8 @@ jobs:
         mkdir -p $HOME/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
         chmod 600 $HOME/.kube/config
+        # Force global insecure access
+        kubectl config set-cluster microk8s-cluster --insecure-skip-tls-verify=true
 
     - name: Deploy to K8s
       run: |
