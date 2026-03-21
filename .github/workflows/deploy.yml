@@ -51,7 +51,7 @@ jobs:
         # Replace placeholders in manifests (if any) or just apply
         # We need to replace ${DOCKER_USERNAME} with the actual username
         sed -i "s/\${DOCKER_USERNAME}/${{ secrets.DOCKER_USERNAME }}/g" k8s/*.yaml
-        kubectl apply -f k8s/namespace.yaml
-        kubectl apply -f k8s/backend.yaml
-        kubectl apply -f k8s/frontend.yaml
-        kubectl apply -f k8s/portainer.yaml
+        kubectl apply -f k8s/namespace.yaml --insecure-skip-tls-verify
+        kubectl apply -f k8s/backend.yaml --insecure-skip-tls-verify
+        kubectl apply -f k8s/frontend.yaml --insecure-skip-tls-verify
+        kubectl apply -f k8s/portainer.yaml --insecure-skip-tls-verify
