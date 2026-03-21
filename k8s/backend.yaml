@@ -18,6 +18,7 @@ spec:
         image: ${DOCKER_USERNAME}/backend:latest
         ports:
         - containerPort: 8000
+          hostPort: 8000
         envFrom:
         - configMapRef:
             name: backend-config
