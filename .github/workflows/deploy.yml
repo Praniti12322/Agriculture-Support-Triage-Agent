@@ -54,6 +54,8 @@ jobs:
         # We need to replace ${DOCKER_USERNAME} with the actual username
         sed -i "s/\${DOCKER_USERNAME}/${{ secrets.DOCKER_USERNAME }}/g" k8s/*.yaml
         kubectl apply -f k8s/namespace.yaml --insecure-skip-tls-verify --validate=false
+        kubectl apply -f k8s/configmap.yaml --insecure-skip-tls-verify --validate=false
+        kubectl apply -f k8s/secrets.yaml --insecure-skip-tls-verify --validate=false
         kubectl apply -f k8s/backend.yaml --insecure-skip-tls-verify --validate=false
         kubectl apply -f k8s/frontend.yaml --insecure-skip-tls-verify --validate=false
         kubectl apply -f k8s/portainer.yaml --insecure-skip-tls-verify --validate=false
