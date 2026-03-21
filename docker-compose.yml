@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         # Change localhost to your EC2 public IP when deploying to AWS, e.g. http://<EC2_IP>:8000
-        - REACT_APP_API_URL=http://3.6.37.49:8000
+        - REACT_APP_API_URL=http://3.110.128.84:8000
     ports:
       # Maps local port 3000 to the container's Nginx port 80
       - "3000:80"
