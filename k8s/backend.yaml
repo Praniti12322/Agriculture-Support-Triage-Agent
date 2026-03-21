@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: agriculture-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ${DOCKER_USERNAME}/backend:latest
+        image: ${DOCKER_USERNAME}/backend:${IMAGE_TAG}
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           hostPort: 8000
