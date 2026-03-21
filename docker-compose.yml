@@ -19,10 +19,26 @@ services:
       dockerfile: Dockerfile
       args:
         # Change localhost to your EC2 public IP when deploying to AWS, e.g. http://<EC2_IP>:8000
-        - REACT_APP_API_URL=http://localhost:8000
+        - REACT_APP_API_URL=http://3.6.37.49:8000
     ports:
       # Maps local port 3000 to the container's Nginx port 80
       - "3000:80"
     depends_on:
       - backend
     restart: always
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    ports:
+      - "9000:9000"
+
+volumes:
+  portainer_data:
