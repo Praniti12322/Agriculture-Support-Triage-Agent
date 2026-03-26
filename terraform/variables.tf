@@ -6,18 +6,18 @@ variable "aws_region" {
 
 variable "instance_type" {
   description = "EC2 instance type"
-  type        = "string"
-  default     = "t3.medium"
+  type        = string
+  default     = "c7i-flex.large"
 }
 
 variable "key_name" {
   description = "Name of the existing AWS Key Pair"
-  type        = "string"
-  default     = "vignesh"
+  type        = string
+  default     = "krishi-key"
 }
 
 variable "ami_id" {
-  description = "Ubuntu 22.04 AMI ID for ap-south-1"
-  type        = "string"
-  default     = "ami-03f4878755434977f" # Ubuntu 22.04 LTS in ap-south-1
+  description = "Ubuntu 24.04 AMI ID for ap-south-1"
+  type        = string
+  default     = "ami-0a14f53a6fe4dfcd1" 
 }
