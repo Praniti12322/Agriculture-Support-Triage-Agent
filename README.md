@@ -11,6 +11,7 @@ Krishi AI Assistant is a professional, AI-powered agricultural support platform 
 - **🎨 Modern Professional UI**: Premium, responsive chat interface with desktop and mobile support.
 - **🔐 Secure Authentication**: User sign-up and login functionality with JWT-based security.
 - **👁️ Vision AI Engine**: Leverages cutting-edge multimodal models on Groq for accurate visual identification.
+- **🏗️ Infrastructure as Code (IaC)**: Automated provisioning of AWS infrastructure using Terraform for scalability and reliability.
 
 ## 🛠️ Tech Stack
 
@@ -18,8 +19,7 @@ Krishi AI Assistant is a professional, AI-powered agricultural support platform 
 - **Backend**: FastAPI (Python), SQLModel (SQLite)
 - **AI Vision Engine**: Groq API (`meta-llama/llama-4-scout-17b-16e-instruct`)
 - **AI Text Engine**: Groq API (`llama-3.1-8b-instant`)
-- **Authentication**: JWT (JSON Web Tokens)
-- **APIs**: Web Speech API (for voice), MediaDevices API (for camera)
+- **Infrastructure**: Terraform (IaC), AWS (EC2), Docker, MicroK8s
 
 ---
 
@@ -28,6 +28,7 @@ Krishi AI Assistant is a professional, AI-powered agricultural support platform 
 Before you begin, ensure you have the following installed:
 - [Python 3.8+](https://www.python.org/downloads/)
 - [Node.js (v14+) and npm](https://nodejs.org/en/download/)
+- [Terraform](https://developer.hashicorp.com/terraform/downloads) (for infrastructure setup)
 - A [Groq Cloud API Key](https://console.groq.com/keys)
 
 ---
@@ -41,7 +42,30 @@ git clone <your-repository-url>
 cd Agriculture-Support-Triage-Agent
 ```
 
-### 2. Backend Setup (FastAPI)
+### 2. Infrastructure Setup (Terraform) 🌐
+
+Automation ke liye Terraform ka use karein:
+
+1. Navigate to the terraform directory:
+   ```powershell
+   cd terraform
+   ```
+2. Set your AWS Credentials (current session):
+   ```powershell
+   $env:AWS_ACCESS_KEY_ID="your_access_key"
+   $env:AWS_SECRET_ACCESS_KEY="your_secret_key"
+   ```
+3. Initialize and Plan:
+   ```powershell
+   .\terraform.exe init
+   .\terraform.exe plan
+   ```
+4. Deploy (Optional):
+   ```powershell
+   .\terraform.exe apply
+   ```
+
+### 3. Backend Setup (FastAPI)
 
 1. Navigate to the backend directory:
    ```bash
@@ -62,7 +86,7 @@ cd Agriculture-Support-Triage-Agent
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file in the `backend/` folder and add your credentials:
+4. Create a `.env` file in the `backend/` folder:
    ```env
    GROQ_API_KEY=your_groq_api_key_here
    MODEL=llama-3.1-8b-instant
@@ -72,52 +96,53 @@ cd Agriculture-Support-Triage-Agent
    ```bash
    uvicorn main:app --reload
    ```
-   The backend will be running at `http://127.0.0.1:8000`.
 
-### 3. Frontend Setup (React)
+### 4. Frontend Setup (React)
 
-1. Open a new terminal window and navigate to the frontend directory:
+1. Navigate to the frontend directory:
    ```bash
    cd frontend
    ```
 
-2. Install the frontend dependencies:
+2. Install dependencies and start:
    ```bash
    npm install
-   ```
-
-3. Start the React development server:
-   ```bash
    npm start
    ```
-   The frontend will be running at `http://localhost:3000`.
+
+---
+
+## 🎤 How to Present in a Meeting
+
+Meeting mein ye points highlight karein:
+
+1. **Automation (IaC)**: "Humne manual infrastructure setup ko khatam kar diya hai. Ab Terraform use karke hum 5 minute mein pura AWS environment automatically khada kar sakte hain."
+2. **Scalability**: "Infrastructure as Code hone ki wajah se hum project ko asani se scale kar sakte hain aur manual configuration errors zero ho gaye hain."
+3. **Consistency**: "Jo setup mere local system par hai, wahi exact setup production server par bhi hoga, thanks to Terraform and Docker."
+4. **Disaster Recovery**: "Agar hamara server down hota hai, to hum `terraform apply` run karke naya server turant ready kar sakte hain."
 
 ---
 
 ## 📖 How to Use
 
-1. **Sign Up / Login**: Create an account or log in to access the assistant.
-2. **Select Language**: Toggle between **EN** (English) and **हिन्दी** (Hindi) for voice input.
-3. **Voice/Text Query**: Click the 🎤 icon to speak or type your crop issue.
-4. **Capture Crop Problem**: Click the 📷 icon to take a photo of your plant or upload an existing image.
-5. **Set Location**: Type your growing region (e.g., "Punjab") to receive localized advice.
-6. **AI Response**: The assistant will analyze both text and images to provide a structured solution with a detected urgency level.
+1. **Sign Up / Login**: User account banayein ya login karein.
+2. **Select Language**: Voice input ke liye EN ya हिन्दी choose karein.
+3. **Voice/Text Query**: Mic icon use karein ya type karein.
+4. **Capture Crop Problem**: Camera icon use karke photo click karein.
+5. **AI Response**: AI aapko solution aur urgency level (Low/Medium/High) provide karega.
 
 ## 👨‍💻 Project Structure
 
 ```
 Agriculture-Support-Triage-Agent/
 ├── backend/                # FastAPI source code
-│   ├── main.py             # API endpoints & AI logic (Vision + Text)
-│   ├── models.py           # SQLModel database models
-│   ├── auth.py             # Security & JWT logic
-│   └── database.py         # DB connection setup
+│   ├── main.py             # API endpoints & AI logic
+│   └── ...
 ├── frontend/               # React source code
-│   ├── src/
-│   │   ├── App.js          # main Chat UI (Voice/Camera/Chat)
-│   │   ├── App.css         # UI Styling & Animations
-│   │   └── AuthForm.js     # Login/Signup components
-│   └── public/             # Static assets (Logo, etc.)
+│   ├── src/App.js          # main Chat UI
+│   └── ...
+├── terraform/              # Infrastructure as Code (AWS EC2, SG)
+├── scripts/                # Automation & Setup scripts
 └── README.md
 ```
 
